@@ -6,63 +6,103 @@
     <title>Alien Deal Scraper</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 20px;
-            background: #0a0f2b;
+            background: radial-gradient(circle at center, #1a2a44 0%, #0a0f2b 100%);
             color: #00ffcc;
             font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            padding: 20px;
             overflow-x: hidden;
         }
         header {
             text-align: center;
             padding: 20px;
-            background: linear-gradient(45deg, #0a0f2b, #1a2a44);
-            border-bottom: 2px solid #ff00ff;
+            border-bottom: 3px solid #ff00ff;
+            background: rgba(0, 0, 0, 0.5);
         }
         h1 {
-            font-size: 2.5em;
+            font-size: 2.8em;
             color: #ff00ff;
-            text-shadow: 0 0 10px #00ffcc;
-            animation: flicker 1.5s infinite alternate;
+            text-shadow: 0 0 15px #00ffcc, 0 0 30px #ff00ff;
+            animation: flicker 2s infinite;
         }
         @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 100% { opacity: 1; } 50% { opacity: 0.8; }
         }
-        p { font-size: 1.2em; }
+        #tracker {
+            font-size: 1.2em;
+            color: #ff4444;
+            animation: scan 1s infinite;
+        }
+        @keyframes scan { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        select, button {
+            padding: 10px;
+            background: #ff00ff;
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover, select:hover {
+            background: #00ffcc;
+            color: #ff00ff;
+            box-shadow: 0 0 10px #00ffcc;
+        }
         #deals {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 20px auto;
         }
         .deal-card {
-            background: rgba(0, 255, 204, 0.1);
-            border: 2px solid #00ffcc;
-            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.15);
+            border: 3px solid #00ffcc;
+            border-radius: 8px;
             padding: 15px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
         }
         .deal-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #ff00ff;
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px #ff00ff;
         }
-        .deal-title { font-size: 1.3em; color: #ff00ff; }
-        .deal-price { font-size: 1.1em; margin: 5px 0; }
-        .deal-original { text-decoration: line-through; color: #777; }
-        .deal-discount { color: #ff00ff; font-weight: bold; }
-        .deal-rating { margin: 5px 0; }
+        .deal-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M10 10l5 5m0-5l-5 5" stroke="%23ff4444" stroke-width="2"/></svg>');
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .deal-card:hover::before { opacity: 0.2; }
+        .deal-title { font-size: 1.4em; color: #ff00ff; }
+        .deal-price { font-size: 1.2em; margin: 5px 0; }
+        .deal-original { text-decoration: line-through; color: #555; }
+        .deal-discount { color: #ff4444; font-weight: bold; }
+        .deal-rating { margin: 5px 0; color: #ff00ff; }
+        .deal-score { font-size: 0.9em; color: #00ffcc; }
         .hotness-bar {
-            height: 10px;
-            background: #ff00ff;
+            height: 8px;
+            background: linear-gradient(to right, #ff4444, #ff00ff);
+            border-radius: 4px;
             margin: 10px 0;
-            border-radius: 5px;
         }
         .buy-btn {
-            display: inline-block;
-            padding: 10px 20px;
+            display: block;
+            text-align: center;
+            padding: 10px;
             background: #00ffcc;
             color: #0a0f2b;
             text-decoration: none;
@@ -70,75 +110,102 @@
             animation: pulse 1.5s infinite;
         }
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        #filter {
-            text-align: center;
-            margin: 20px 0;
-        }
-        #sort-btn {
-            padding: 10px 20px;
-            background: #ff00ff;
-            color: #00ffcc;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); }
         }
         footer {
             text-align: center;
             padding: 20px;
             color: #777;
+            font-size: 0.9em;
         }
+        .egg {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00ffcc;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: glow 2s infinite;
+        }
+        @keyframes glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
     <header>
         <h1>Alien Deal Scraper</h1>
-        <p>Survive the Savings!</p>
+        <div id="tracker">Scanning Deals...</div>
     </header>
-    <div id="filter">
-        <button id="sort-btn">Sort by Discount</button>
+    <div id="controls">
+        <select id="categoryFilter">
+            <option value="all">All Categories</option>
+            <option value="Tech">Tech</option>
+            <option value="Gear">Gear</option>
+            <option value="Weapons">Weapons</option>
+        </select>
+        <button id="sortDiscount">Sort by Discount</button>
+        <button id="sortPrice">Sort by Price</button>
+        <button id="sortHotness">Sort by Hotness</button>
     </div>
     <div id="deals"></div>
-    <footer>Powered by xAI</footer>
+    <footer>Powered by xAI <span class="egg"></span></footer>
     <script>
-        // Fake deals (Amazon/Slickdeals-inspired)
-        let deals = [
-            { title: "Xenomorph Trap", price: "$29.99", originalPrice: "$59.99", discount: "50%", rating: 4.5, hotness: 85, link: "#" },
-            { title: "Pulse Rifle", price: "$99.99", originalPrice: "$149.99", discount: "33%", rating: 4.8, hotness: 95, link: "#" },
-            { title: "Facehugger Mask", price: "$9.99", originalPrice: "$19.99", discount: "50%", rating: 4.0, hotness: 70, link: "#" },
-            { title: "Nostromo Hoodie", price: "$39.99", originalPrice: "$69.99", discount: "43%", rating: 4.2, hotness: 80, link: "#" }
+        // Deal data
+        const deals = [
+            { title: "Plasma Cutter", price: 49.99, originalPrice: 99.99, discount: 50, category: "Tech", rating: 4.7, hotness: 92, link: "#" },
+            { title: "Exosuit Gloves", price: 29.99, originalPrice: 59.99, discount: 50, category: "Gear", rating: 4.3, hotness: 78, link: "#" },
+            { title: "Pulse Rifle X-9", price: 149.99, originalPrice: 249.99, discount: 40, category: "Weapons", rating: 4.9, hotness: 98, link: "#" },
+            { title: "Motion Tracker", price: 89.99, originalPrice: 129.99, discount: 31, category: "Tech", rating: 4.5, hotness: 85, link: "#" },
+            { title: "Acid-Proof Vest", price: 69.99, originalPrice: 119.99, discount: 42, category: "Gear", rating: 4.6, hotness: 88, link: "#" }
         ];
 
-        // Render deals
+        // Render function
         function renderDeals(dealArray) {
             const dealsDiv = document.getElementById('deals');
             dealsDiv.innerHTML = '';
             dealArray.forEach(deal => {
+                const score = Math.round((deal.discount * deal.hotness) / 100);
                 const card = document.createElement('div');
                 card.className = 'deal-card';
                 card.innerHTML = `
                     <div class="deal-title">${deal.title}</div>
-                    <div class="deal-price">${deal.price} <span class="deal-original">${deal.originalPrice}</span></div>
-                    <div class="deal-discount">${deal.discount} Off</div>
-                    <div class="deal-rating">${'★'.repeat(Math.floor(deal.rating))}${'☆'.repeat(5 - Math.floor(deal.rating))}</div>
+                    <div class="deal-price">$${deal.price.toFixed(2)} <span class="deal-original">$${deal.originalPrice.toFixed(2)}</span></div>
+                    <div class="deal-discount">${deal.discount}% Off</div>
+                    <div class="deal-rating">${'★'.repeat(Math.floor(deal.rating))}${'☆'.repeat(5 - Math.floor(deal.rating)))}</div>
                     <div class="hotness-bar" style="width: ${deal.hotness}%"></div>
+                    <div class="deal-score">AI Score: ${score}</div>
                     <a href="${deal.link}" class="buy-btn">Buy Now</a>
                 `;
                 dealsDiv.appendChild(card);
             });
         }
 
+        // Filter and sort logic
+        function updateDeals() {
+            let filtered = [...deals];
+            const category = document.getElementById('categoryFilter').value;
+            if (category !== 'all') {
+                filtered = filtered.filter(deal => deal.category === category);
+            }
+            renderDeals(filtered);
+        }
+
         // Initial render
         renderDeals(deals);
 
-        // Sort by discount
-        document.getElementById('sort-btn').addEventListener('click', () => {
-            deals.sort((a, b) => parseFloat(b.discount) - parseFloat(a.discount));
-            renderDeals(deals);
+        // Event listeners
+        document.getElementById('categoryFilter').addEventListener('change', updateDeals);
+        document.getElementById('sortDiscount').addEventListener('click', () => {
+            deals.sort((a, b) => b.discount - a.discount);
+            updateDeals();
+        });
+        document.getElementById('sortPrice').addEventListener('click', () => {
+            deals.sort((a, b) => a.price - b.price);
+            updateDeals();
+        });
+        document.getElementById('sortHotness').addEventListener('click', () => {
+            deals.sort((a, b) => b.hotness - a.hotness);
+            updateDeals();
         });
     </script>
 </body>
-</html> 
+</html>
